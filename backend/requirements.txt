@@ -1,0 +1,19 @@
+# --- ML / Torch ---
+torch==2.9.1
+torchvision==0.24.1
+
+# --- Diffusers / Transformers ---
+diffusers==0.36.0.dev0
+transformers==4.57.3
+accelerate==1.12.0
+safetensors==0.7.0
+
+# --- Image / NumPy ---
+Pillow==12.0.0
+numpy==2.3.5
+
+# --- Backend ---
+fastapi==0.118.2
+uvicorn[standard]==0.37.0
+
+# --- Environment ---

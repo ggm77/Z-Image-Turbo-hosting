@@ -11,7 +11,7 @@
 
 ### **Backend (API Server)**
 - FastAPI  
-- Python 3.11+  
+- Python 3.11.13
 - Diffusers / Z Image Turbo Pipeline  
 - Uvicorn  
 
@@ -31,6 +31,7 @@ Z-Image-Turbo-hosting/
 ├── frontend/ # React 웹 UI
 │ ├── src/
 │ └── package.json
+├── model/ # Z Image Turbo 모델 위치
 ├── README.md
 └── .gitignore
 ```
