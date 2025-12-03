@@ -8,6 +8,7 @@ import asyncio
 import torch
 from diffusers import ZImagePipeline
 
+from app.core.middleware import setup_cors
 from app.api.v1.endpoints.generate.generate import router as generate_rounter
 
 @asynccontextmanager
@@ -49,13 +50,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3010"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+setup_cors(app)
 
 app.include_router(generate_rounter)
 
