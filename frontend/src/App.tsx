@@ -9,8 +9,6 @@ type GenerateRequest = {
   seed: number;
 };
 
-const API_BASE_URL = "http://localhost:8000";
-
 const App: React.FC = () => {
   const [prompt, setPrompt] = useState("");
   const [height, setHeight] = useState(512);
@@ -50,7 +48,7 @@ const App: React.FC = () => {
         seed,
       };
 
-      const res = await fetch(`${API_BASE_URL}/api/v1/generate`, {
+      const res = await fetch(`/api/v1/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
