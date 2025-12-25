@@ -7,6 +7,12 @@ __pycache__/
 # AI Model
 model/
 
+# generated images
+backend/app/generated_images/
+
+# SQLite database
+backend/app/db/app.db
+
 # Logs
 logs
 *.log
