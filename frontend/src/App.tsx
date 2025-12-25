@@ -16,6 +16,9 @@ const App: React.FC = () => {
   const [numSteps, setNumSteps] = useState(9);
   const [seed, setSeed] = useState(42);
 
+  const [taskId, setTaskId] = useState("");
+  const [taskStatus, setTaskStatus] = useState("");
+
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +40,6 @@ const App: React.FC = () => {
     }
 
     setError(null);
-    setIsGenerating(true);
 
     try {
       const payload: GenerateRequest = {
@@ -55,7 +57,37 @@ const App: React.FC = () => {
       });
 
       if (!res.ok) {
-        throw new Error(`이미지 생성 실패: ${res.status}`);
+        throw new Error(`이미지 생성 요청 실패: ${res.status}`);
+      }
+
+      setIsGenerating(true);
+
+      const data = await res.json();
+      setTaskId(data.task_id);
+
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "알 수 없는 오류입니다.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const getGeneratedImage = async () => {
+
+    setError(null);
+
+    if(isGenerating) {
+      throw new Error("이미지 생성 중입니다. 잠시만 기다려주세요.");
+    }
+
+    try {
+      const res = await fetch('/api/v1/tasks/' + taskId + '/result', {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        throw new Error(`이미지 생성 결과 요청 실패: ${res.status}`);
       }
 
       const blob = await res.blob();
@@ -63,12 +95,44 @@ const App: React.FC = () => {
 
       if (imageUrl) URL.revokeObjectURL(imageUrl);
       setImageUrl(url);
-
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "알 수 없는 오류입니다.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const getLatestTaskId = async () => {
+
+    setError(null);
+
+    try {
+      const res = await fetch('/api/v1/tasks', {
+        method: "GET",
+      });
+    
+      if(!res.ok) {
+        throw new Error(`태스크 목록 요청 실패: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      if(data && data.length > 0) {
+        if(data[0].status === 'completed') {
+          setIsGenerating(false);
+        }
+        else if(data[0].status === 'failed') {
+          setIsGenerating(false);
+          throw new Error("태스크가 실패했습니다.");
+        }
+        setTaskId(data[0].task_id);
+        setTaskStatus(data[0].status);
+      } else {
+        throw new Error("태스크가 없습니다.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "알 수 없는 오류입니다.");
     }
   };
 
@@ -112,6 +176,14 @@ const App: React.FC = () => {
           {isGenerating ? "생성 중..." : "이미지 생성"}
         </button>
       </form>
+
+      <button onClick={getLatestTaskId} style={{ marginTop: "10px" }}>최신 태스크 ID 가져오기</button>
+      <button onClick={getGeneratedImage} style={{ marginTop: "10px" }}>태스크 ID로 이미지 가져오기</button>
+
+      <div>
+        <p>{taskId.length > 0 ? "태스크 ID: " + taskId : "태스크 ID: 태스크 조회 되지 않음"}</p>
+        <p>{taskStatus.length > 0 ? "태스크 상태: " + taskStatus : "태스크 상태: 태스크 조회 되지 않음"}</p>
+      </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
