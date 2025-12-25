@@ -1,4 +1,4 @@
-# uvicorn app.main:app --reload --port=8000
+# uvicorn app.main:app --port=8000
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
